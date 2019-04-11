@@ -1,8 +1,11 @@
 import process_data
 import numpy as np
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression as lr
 from sklearn.svm import SVC
 from sklearn import preprocessing
+from sklearn.ensemble import BaggingClassifier as bagging
+from sklearn.ensemble import AdaBoostClassifier as adaboost
+from sklearn.neural_network import MLPClassifier as mlp
 
 # Some test stuff
 _, epa = process_data.load_dataset('epa_data.csv')
@@ -12,29 +15,67 @@ _, meso = process_data.load_dataset('meso_data.csv')
 dataset = []
 
 for date, epa_data in epa.items():
-	if date in meso:
-		meso_data = meso[date]
-		category = epa_data[1]
+    if date in meso:
+        meso_data = meso[date]
+        category = epa_data[1]
 
-		if category == 'Hazardous' or category == 'Very Unhealthy':
-			category = 'Unhealthy'
+        if category == 'Hazardous' or category == 'Very Unhealthy':
+            category = 'Unhealthy'
 
-		dataset.append(meso_data + [category]) 
+        dataset.append(meso_data + [category])
 
 names, converted = process_data.convert_class(dataset)
 converted = process_data.time_series(converted)
 
-dataset_train = np.array(converted[:7000], dtype='float64') # 7000 samples for training
-dataset_test = np.array(converted[7000:], dtype='float64') # 601 samples for testing
+dataset_train = np.array(converted[:7000], dtype='float64')  # 7000 samples for training
+dataset_test = np.array(converted[7000:], dtype='float64')  # 601 samples for testing
 
-dataset_train_x = preprocessing.scale(dataset_train[:,:-1])
-dataset_train_y = dataset_train[:,-1]
-dataset_test_x = preprocessing.scale(dataset_test[:,:-1])
-dataset_test_y = dataset_test[:,-1]
+dataset_train_x = preprocessing.scale(dataset_train[:, :-1])
+dataset_train_y = dataset_train[:, -1]
+dataset_test_x = preprocessing.scale(dataset_test[:, :-1])
+dataset_test_y = dataset_test[:, -1]
 
 clf = SVC(C=0.75, gamma=2.0)
 clf.fit(dataset_train_x, dataset_train_y)
+print("SVM: Training Score: " + str(clf.score(dataset_train_x, dataset_train_y)))
+print("SVM: Testing Score: " + str(clf.score(dataset_test_x, dataset_test_y)))
 
-print("Training Score: " + str(clf.score(dataset_train_x, dataset_train_y)))
-print("Testing Score: " + str(clf.score(dataset_test_x, dataset_test_y)))
+clf = bagging(n_estimators=200, oob_score=True)
+clf.fit(dataset_train_x, dataset_train_y)
+print("Bagging Training Score: " + str(clf.score(dataset_train_x, dataset_train_y)))
+print("Bagging Testing Score: " + str(clf.score(dataset_test_x, dataset_test_y)))
 
+clf = adaboost(n_estimators=50, learning_rate=.3)
+clf.fit(dataset_train_x, dataset_train_y)
+print("Adaboost Training Score: " + str(clf.score(dataset_train_x, dataset_train_y)))
+print("Adaboost Testing Score: " + str(clf.score(dataset_test_x, dataset_test_y)))
+
+clf = mlp(activation='relu', alpha=1e-05, batch_size='auto',
+          beta_1=0.9, beta_2=0.999, early_stopping=False,
+          epsilon=1e-08, hidden_layer_sizes=(5, 2),
+          learning_rate='constant', learning_rate_init=0.001,
+          max_iter=200, momentum=0.9,
+          nesterovs_momentum=True, power_t=0.5, random_state=1,
+          shuffle=True, solver='lbfgs', tol=0.0001,
+          validation_fraction=0.1, verbose=False, warm_start=False)
+clf.fit(dataset_train_x, dataset_train_y)
+print("Neural Net Training Score: " + str(clf.score(dataset_train_x, dataset_train_y)))
+print("Neural Net Testing Score: " + str(clf.score(dataset_test_x, dataset_test_y)))
+
+clf = lr()
+clf.fit(dataset_train_x, dataset_train_y)
+print("Linear Regression Training Score: " + str(clf.score(dataset_train_x, dataset_train_y)))
+print("Linear Regression Testing Score: " + str(clf.score(dataset_test_x, dataset_test_y)))
+
+
+# best_test_list = []
+# best_train_list = []
+# for g in np.arange(.05, .5, .05):
+#     for c in range(50, 500, 50):
+#         clf = adaboost(n_estimators=c, learning_rate=g)
+#         clf.fit(dataset_train_x, dataset_train_y)
+#         best_train_list.append((c, g, str(clf.score(dataset_train_x, dataset_train_y))))
+#         best_test_list.append((c, g, str(clf.score(dataset_test_x, dataset_test_y))))
+
+# print(max(best_test_list, key=lambda iter: iter[2]))
+# print(max(best_train_list, key=lambda iter: iter[2]))

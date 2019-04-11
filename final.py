@@ -62,11 +62,6 @@ clf.fit(dataset_train_x, dataset_train_y)
 print("Neural Net Training Score: " + str(clf.score(dataset_train_x, dataset_train_y)))
 print("Neural Net Testing Score: " + str(clf.score(dataset_test_x, dataset_test_y)))
 
-clf = lr()
-clf.fit(dataset_train_x, dataset_train_y)
-print("Linear Regression Training Score: " + str(clf.score(dataset_train_x, dataset_train_y)))
-print("Linear Regression Testing Score: " + str(clf.score(dataset_test_x, dataset_test_y)))
-
 
 # best_test_list = []
 # best_train_list = []

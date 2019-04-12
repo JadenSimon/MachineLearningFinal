@@ -2,6 +2,7 @@ import process_data
 import numpy as np
 from sklearn.svm import SVC
 from sklearn import preprocessing
+from sklearn.linear_model import SGDClassifier as sgd
 from sklearn.ensemble import BaggingClassifier as bagging
 from sklearn.ensemble import AdaBoostClassifier as adaboost
 from sklearn.neural_network import MLPClassifier as mlp
@@ -34,11 +35,13 @@ dataset_train_y = dataset_train[:, -1]
 dataset_test_x = preprocessing.scale(dataset_test[:, :-1])
 dataset_test_y = dataset_test[:, -1]
 
-# SVM
-clf = SVC(C=0.75, gamma=2.0)
+print('------ Begin experiments...')
+
+# Linear regressions (SGD)
+clf = sgd(loss='huber', penalty='l1', max_iter=8)
 clf.fit(dataset_train_x, dataset_train_y)
-print("SVM Training Score: {}".format(round(clf.score(dataset_train_x, dataset_train_y), 2)))
-print("SVM Testing Score: {}".format(round(clf.score(dataset_test_x, dataset_test_y), 2)))
+print("Linear Regression (SGD) Training Score: {}".format(round(clf.score(dataset_train_x, dataset_train_y), 2)))
+print("Linear Regression (SGD) Testing Score: {}".format(round(clf.score(dataset_test_x, dataset_test_y), 2)))
 
 # Bagging with decesion stumps
 clf = bagging(n_estimators=200, oob_score=True)
@@ -51,6 +54,12 @@ clf = adaboost(n_estimators=50, learning_rate=.3)
 clf.fit(dataset_train_x, dataset_train_y)
 print("Adaboost Training Score: {}".format(round(clf.score(dataset_train_x, dataset_train_y), 2)))
 print("Adaboost Testing Score: {}".format(round(clf.score(dataset_test_x, dataset_test_y), 2)))
+
+# SVM
+clf = SVC(C=0.75, gamma=2.0)
+clf.fit(dataset_train_x, dataset_train_y)
+print("SVM Training Score: {}".format(round(clf.score(dataset_train_x, dataset_train_y), 2)))
+print("SVM Testing Score: {}".format(round(clf.score(dataset_test_x, dataset_test_y), 2)))
 
 # Multi-level Perceptron Neural Network
 clf = mlp(activation='relu', alpha=1e-05, batch_size='auto',
@@ -68,12 +77,14 @@ print("Neural Network Testing Score: {}".format(round(clf.score(dataset_test_x, 
 
 # best_test_list = []
 # best_train_list = []
-# for g in np.arange(.05, .5, .05):
-#     for c in range(50, 500, 50):
-#         clf = adaboost(n_estimators=c, learning_rate=g)
-#         clf.fit(dataset_train_x, dataset_train_y)
-#         best_train_list.append((c, g, str(clf.score(dataset_train_x, dataset_train_y))))
-#         best_test_list.append((c, g, str(clf.score(dataset_test_x, dataset_test_y))))
+# for g in [4, 5, 6, 7, 8, 9, 10]:
+#     # for c in range(50, 500, 50):
+#   clf = sgd(loss='huber', penalty='l1', max_iter=g)
+#   clf.fit(dataset_train_x, dataset_train_y)
+#   best_train_list.append((g, str(clf.score(dataset_train_x, dataset_train_y))))
+#   best_test_list.append((g, str(clf.score(dataset_test_x, dataset_test_y))))
 
-# print(max(best_test_list, key=lambda iter: iter[2]))
-# print(max(best_train_list, key=lambda iter: iter[2]))
+# print(max(best_test_list, key=lambda iter: iter[1]))
+# print(max(best_train_list, key=lambda iter: iter[1]))
+
+print('-------')

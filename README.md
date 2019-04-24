@@ -10,7 +10,7 @@ Since this is time series forecasting, we use the AQI from each day as a feature
 AQI can be between 0 and 500. The EPA also has categorized certain ranges:
 [0, 50] - Good
 [51, 100] - Moderate
-[101, 150] - Unhealth for Sensistive Groups
+[101, 150] - Unhealthy for Sensistive Groups
 [151, 200] - Unhealthy
 [201, 300] - Very Unhealthy
 [301, 500] - Hazardous

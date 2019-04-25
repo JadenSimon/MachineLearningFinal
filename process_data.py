@@ -43,7 +43,7 @@ def process_epa_data(file_name):
 	return data
 
 # Processes all files in raw_epa_data folder, creating a single epa_data csv file
-def create_epa_dataset():	
+def create_epa_dataset():
 	with open('epa_data.csv', 'w', newline='') as csvfile:
 		writer = csv.writer(csvfile, delimiter=',')
 		writer.writerow(['Date', 'AQI', 'Category', 'Parameter']) # Adds a header
@@ -91,16 +91,16 @@ def process_meso_data(file_name):
 		for row in csv_reader:
 			date, time = row[1].split('T', 2) # Get the date from the timestamp
 
-			# End of sequence, store averages 
+			# End of sequence, store averages
 			if date != current_date:
 				processed_data[current_date] = [avg_temp/count, avg_wind[0]/count, avg_wind[1]/count, avg_humidity/count, avg_pressure/count]
 				avg_temp = 0.0
-				avg_wind = [0.0, 0.0] 
+				avg_wind = [0.0, 0.0]
 				avg_humidity = 0.0
 				avg_pressure = 0.0
 				count = 0.0
 				current_date = date
-			
+
 			# Update averages
 			avg_temp += verify_input(row[temp_index])
 			avg_humidity += verify_input(row[humidity_index])
@@ -121,8 +121,8 @@ def process_meso_data(file_name):
 def create_meso_dataset():
 	datasets = []
 	processed_data = {}
-	
-	# First collect all the datasets to be merged	
+
+	# First collect all the datasets to be merged
 	for f in listdir('raw_meso_data'):
 		datasets.append(process_meso_data('raw_meso_data/' + f))
 

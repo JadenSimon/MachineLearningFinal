@@ -16,3 +16,5 @@ AQI can be between 0 and 500. The EPA also has categorized certain ranges:
 [301, 500] - Hazardous
 
 The latter two categories will be ommitted due to being outliers. Our current dataset has only a single 'Hazardous' and 5 'Very Unhealthy' data points out of 7612 examples. They will instead be grouped into the 'Unhealthy' category.
+
+Simple run "run.sh" to execute.

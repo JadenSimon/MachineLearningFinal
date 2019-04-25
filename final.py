@@ -64,7 +64,7 @@ print("SVM Testing Score: {}".format(round(clf.score(dataset_test_x, dataset_tes
 # Multi-level Perceptron Neural Network
 clf = mlp(activation='relu', alpha=1e-05, batch_size='auto',
           beta_1=0.9, beta_2=0.999, early_stopping=False,
-          epsilon=1e-08, hidden_layer_sizes=(5, 2),
+          epsilon=1e-08, hidden_layer_sizes=(10, 2),
           learning_rate='constant', learning_rate_init=0.001,
           max_iter=200, momentum=0.9,
           nesterovs_momentum=True, power_t=0.5, random_state=1,
